@@ -1,4 +1,5 @@
 groundControl
 =============
 
-Fly your drone from your pc via xbee or the internet.
+groundControl is a python app under development with the goal of controlling an unmanned 
+vehicle remotely using a PC for ground control. 
