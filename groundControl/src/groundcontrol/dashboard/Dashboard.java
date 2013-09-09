@@ -1,9 +1,15 @@
 package groundcontrol.dashboard;
 
+import groundcontrol.communication.CommunicationObject;
 import groundcontrol.dashboard.test.*;
+import groundcontrol.state.*;
+
 import java.awt.event.*;
+
 import javax.swing.*;
+
 import java.awt.*;
+import java.util.LinkedList;
 
 
 /******************************************************************
@@ -11,6 +17,9 @@ import java.awt.*;
  * groundcontrol objects.
  *****************************************************************/
 public class Dashboard extends javax.swing.JFrame implements ActionListener {
+	LinkedList<CommunicationObject> txqueue;	// Transmit queue.
+	State stateLog;								// State object.
+	
 	JButton b1;
 	JButton b2;
 	JButton b3;
@@ -20,11 +29,16 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener {
 	/******************************************************************
 	 * Default constructor sets up the required objects.
 	 *****************************************************************/
-	public Dashboard(){
+	public Dashboard(LinkedList<CommunicationObject> thetxqueue, 
+			State theStateLog){
 		super("Ground Control");
 		setSize(800,600);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setLookAndFeel();
+		
+		txqueue = thetxqueue;	// Set the tx queue.
+		stateLog = theStateLog;
+		
 		b1 = new JButton("Up");
 		b2 = new JButton("Down");
 		b3 = new JButton("Set Value");
