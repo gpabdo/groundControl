@@ -9,7 +9,6 @@ import groundcontrol.state.*;
 public class Communication implements Runnable {
 	public LinkedList<CommunicationObject> txqueue;
 	public LinkedList<CommunicationObject> rxqueue;
-	private State currentState;
 	private boolean run;
 	
 	/******************************************************************
@@ -31,7 +30,8 @@ public class Communication implements Runnable {
 			if(!txqueue.isEmpty())
 				transmit();
 			
-				
+			receive();
+			
 		} // close while
 	}
 	
@@ -41,11 +41,7 @@ public class Communication implements Runnable {
 	 * Transmitted.
 	 *****************************************************************/
 	private void transmit(){
-		CommunicationObject objectOfInterest = txqueue.pop();
-		if( currentState.stateChange(objectOfInterest))
-		{
-			// TODO: transmit the packet.
-		}
+		
 	}
 
 	/******************************************************************
@@ -53,11 +49,6 @@ public class Communication implements Runnable {
 	 * to be placed in the drones current state.
 	 *****************************************************************/
 	private void receive(){
-		
-		// TODO: receive packet
-		
-		int command = 0, value = 0;
-		CommunicationObject objectOfInterest = new CommunicationObject(command, value);
-		currentState.stateChange(objectOfInterest);
+
 	}
 }

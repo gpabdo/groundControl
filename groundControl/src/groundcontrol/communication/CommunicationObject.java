@@ -18,22 +18,27 @@ import java.util.Calendar;
  * 6  = Actual roll
  * 7  = Desired yaw
  * 8  = Actual yaw
- * 9  = airspeed
- * 10 = 
+ * 9  = Desired airspeed
+ * 10 = Actual airspeed
+ * 11 = Desired barometric altitude
+ * 12 = Actual barometric altitude
  * 
  *****************************************************************/
 public class CommunicationObject {
 	private int command;
 	private int value;
+	private String source;
 	private java.util.Date now;
 	
 	/******************************************************************
 	 * Default constructor builds the CommunicationObject.
 	 *****************************************************************/
-	public CommunicationObject( int theCommand, int theValue){
+	public CommunicationObject( int theCommand, int theValue, 
+			String theSource){
 		now = Calendar.getInstance().getTime();
 		command = theCommand;
 		value = theValue;
+		source = theSource;
 	}
 	
 	/******************************************************************
@@ -45,6 +50,11 @@ public class CommunicationObject {
 	 * Returns the value of the command.
 	 *****************************************************************/
 	public int getValue(){ return value; }
+	
+	/******************************************************************
+	 * Returns the source of the com object.
+	 *****************************************************************/
+	public String getSource(){ return source; }
 	
 	/******************************************************************
 	 * 
