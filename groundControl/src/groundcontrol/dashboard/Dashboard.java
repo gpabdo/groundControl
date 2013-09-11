@@ -17,7 +17,6 @@ import java.util.LinkedList;
  * groundcontrol objects.
  *****************************************************************/
 public class Dashboard extends javax.swing.JFrame implements ActionListener {
-	LinkedList<CommunicationObject> txqueue;	// Transmit queue.
 	State stateLog;								// State object.
 	
 	JButton b1;
@@ -29,15 +28,13 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener {
 	/******************************************************************
 	 * Default constructor sets up the required objects.
 	 *****************************************************************/
-	public Dashboard(LinkedList<CommunicationObject> thetxqueue, 
-			State theStateLog){
+	public Dashboard( State theState ){
 		super("Ground Control");
 		setSize(800,600);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setLookAndFeel();
 		
-		txqueue = thetxqueue;	// Set the tx queue.
-		stateLog = theStateLog;
+		stateLog = theState;
 		
 		b1 = new JButton("Up");
 		b2 = new JButton("Down");

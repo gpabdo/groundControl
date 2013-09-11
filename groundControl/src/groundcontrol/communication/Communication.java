@@ -1,22 +1,23 @@
 package groundcontrol.communication;
 
 import java.util.LinkedList;
+import groundcontrol.state.*;
 
 /******************************************************************
  * 
  *****************************************************************/
 public class Communication implements Runnable {
-	LinkedList<CommunicationObject> txqueue;
-	LinkedList<CommunicationObject> rxqueue;
-	boolean run;
+	public LinkedList<CommunicationObject> txqueue;
+	public LinkedList<CommunicationObject> rxqueue;
+	private State currentState;
+	private boolean run;
 	
 	/******************************************************************
 	 * 
 	 *****************************************************************/
-	public Communication(LinkedList<CommunicationObject> txqueue2, 
-			LinkedList<CommunicationObject> rxqueue2){
-		txqueue = txqueue2;
-		rxqueue = rxqueue2;
+	public Communication(){
+		txqueue = new LinkedList<CommunicationObject>();
+		rxqueue = new LinkedList<CommunicationObject>();
 		run = true;
 	}
 	
@@ -35,16 +36,28 @@ public class Communication implements Runnable {
 	}
 	
 	/******************************************************************
-	 * 
+	 * Pulls a communication object off the tx queue and checks to see 
+	 * if it will change the current state. If so, it will be 
+	 * Transmitted.
 	 *****************************************************************/
 	private void transmit(){
-		
+		CommunicationObject objectOfInterest = txqueue.pop();
+		if( currentState.stateChange(objectOfInterest))
+		{
+			// TODO: transmit the packet.
+		}
 	}
 
 	/******************************************************************
-	 * 
+	 * When a packet is received, send the object to the state object 
+	 * to be placed in the drones current state.
 	 *****************************************************************/
 	private void receive(){
 		
+		// TODO: receive packet
+		
+		int command = 0, value = 0;
+		CommunicationObject objectOfInterest = new CommunicationObject(command, value);
+		currentState.stateChange(objectOfInterest);
 	}
 }

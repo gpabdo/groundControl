@@ -16,21 +16,16 @@ public class GroundControl{
 	Input human;			// Input object.
 	State stateLog;			// State object.
 	
-	LinkedList<CommunicationObject> txqueue;
-	LinkedList<CommunicationObject> rxqueue;
-	
 	boolean run;
 	
 	/******************************************************************
 	 * Default constructor sets up the required objects.
 	 *****************************************************************/
 	public GroundControl(){
-		dash = new Dashboard(txqueue, stateLog);
-		com = new Communication(txqueue, rxqueue);
+		dash = new Dashboard(stateLog);
+		com = new Communication();
 		human = new Input(stateLog);
-		stateLog = new State(txqueue);
-		txqueue = new LinkedList<CommunicationObject>();
-		rxqueue = new LinkedList<CommunicationObject>();
+		stateLog = new State(com);
 		run = true;
 	}
 
@@ -39,8 +34,8 @@ public class GroundControl{
 	 *****************************************************************/
 	public void start() {
 		Thread comThread = new Thread(com);		// Create com thread.
-		comThread.start();						// Start com thread.
 		Thread inputThread = new Thread(human); // Create input thread.
+		comThread.start();						// Start com thread.
 		inputThread.start();					// Start input thread.
 		
 		while(run){
