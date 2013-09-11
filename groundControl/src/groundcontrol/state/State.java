@@ -12,35 +12,40 @@ public class State {
 	private LinkedList<LinkedList<CommunicationObject>> currentState;
 	private Communication com;
 	private boolean[] update;
+	private boolean log;
 
-	private static final int LENGTH = 20;
-	private static final int WRITE_LIST_SIZE = 2000;
-	private static final int TRIM_LIST_SIZE = 100;
-	
-	public static final int ACK 						= 0;
-	public static final int DESIRED_THROTTLE 			= 1;
-	public static final int ACTUAL_THROTTLE 			= 2;
-	public static final int DESIRED_PITCH 				= 3;
-	public static final int ACTUAL_PITCH				= 4;
-	public static final int DESIRED_ROLL				= 5;
-	public static final int ACTUAL_ROLL					= 6;
-	public static final int DESIRED_YAW					= 7;
-	public static final int ACTUAL_YAW					= 8;
-	public static final int DESIRED_AIRSPEED			= 9;
-	public static final int ACTUAL_AIRSPEED				= 10;
-	public static final int DESIRED_BAROMETRIC_ALTITUDE	= 11;
-	public static final int ACTUAL_BAROMETRIC_ALTITUDE	= 12;
+	private static final int LENGTH 					= 20;
+	private static final int TRIM_LIST_SIZE 			= 100;
+	private static final int WRITE_LIST_SIZE 			= 1000;
+
+	public static final int DESIRED_THROTTLE 			= 0;
+	public static final int ACTUAL_THROTTLE 			= 1;
+	public static final int DESIRED_PITCH 				= 2;
+	public static final int ACTUAL_PITCH				= 3;
+	public static final int DESIRED_ROLL				= 4;
+	public static final int ACTUAL_ROLL					= 5;
+	public static final int DESIRED_YAW					= 6;
+	public static final int ACTUAL_YAW					= 7;
+	public static final int DESIRED_AIRSPEED			= 8;
+	public static final int ACTUAL_AIRSPEED				= 9;
+	public static final int DESIRED_LANDSPEED			= 10;
+	public static final int ACTUAL_LANDSPEED			= 11;
+	public static final int DESIRED_BAROMETRIC_ALTITUDE	= 12;
+	public static final int ACTUAL_BAROMETRIC_ALTITUDE	= 13;
+	public static final int ACK 						= 255;
 	
 	/******************************************************************
 	 * 
 	 *****************************************************************/
 	public State(){
 		update = new boolean[LENGTH];
+		setLog( false );
 		currentState = new LinkedList<LinkedList<CommunicationObject>>();
+		
 		for( int i = 0; i < LENGTH; i++){
 			currentState.add(new LinkedList<CommunicationObject>());
 			currentState.get(i).add(new CommunicationObject(i, 0, "GROUND"));
-			update[i] = true;
+			update[i] = false;
 		}
 			
 		com = new Communication();
@@ -59,22 +64,17 @@ public class State {
 	 * the current state of the drone. If this is a change in state, 
 	 * the state change is logged and true is returned.
 	 *****************************************************************/
-	public void desiredStateChange(CommunicationObject state){
-		
-		if( getCurrentState(state.getIdentifier()) != state.getValue()){
-			currentState.get( state.getIdentifier() ).add(state);	
-			com.txqueue.add(state);
-		}
-	}
-	
-	/******************************************************************
-	 * 
-	 *****************************************************************/
-	public void droneStateChange(CommunicationObject state){
-		
-		if( currentState.get( state.getIdentifier() ).getFirst().getValue() != state.getValue()){
-			currentState.get( state.getIdentifier() ).add(state);
-			saveState(currentState.get(state.getIdentifier()));
+	public void StateChange(CommunicationObject state){
+		int id = state.getIdentifier();
+		if( getCurrentState(id) != state.getValue()){
+			currentState.get(id).add(state);	
+			update[id] = true;
+			
+			if(state.getSource() == "PILOT"){
+				com.txqueue.add(state);
+				update[id] = false;
+			}
+			saveState(currentState.get(id));
 		}
 	}
 	
@@ -90,9 +90,11 @@ public class State {
 		{
 			CommunicationObject temp = theList.remove(i);
 			temp.getString();
-		}
 			
-		// TODO save state list to history file and posibly extract video.
+			if(log){
+				// TODO write to log files here.
+			}	
+		}	
 	}
 	
 	/******************************************************************
@@ -104,6 +106,8 @@ public class State {
 		return currentState.get(identifier).getFirst().getValue();
 	}
 
+	public void setLog( boolean setLog){ log = setLog; }
+	
 	/******************************************************************
 	 * 
 	 *****************************************************************/

@@ -29,5 +29,9 @@ public class GroundControl{
 	public void start() {
 		Thread inputThread = new Thread(human); // Create input thread.
 		inputThread.start();					// Start input thread.
+		
+		while(run){
+			
+		}
 	}
 }

@@ -7,14 +7,30 @@ import groundcontrol.state.*;
  * 
  *****************************************************************/
 public class Input implements Runnable{
-	State stateLog;			// State object.
+	State currentState;			// State object.
 	boolean run;
+	
+	controlObject throttle;
+	controlObject pitch;
+	controlObject roll;
+	controlObject yaw;
+	
+	public static final int THROTTLE		= 0;
+	public static final int PITCH			= 2;
+	public static final int ROLL			= 4;
+	public static final int YAW				= 6;
 	
 	/******************************************************************
 	 * 
 	 *****************************************************************/
-	public Input(State theStateLog){
-		stateLog = theStateLog;
+	public Input(State theState){
+		currentState = theState;
+		
+		throttle = new controlObject(THROTTLE);
+		pitch = new controlObject(PITCH);
+		roll = new controlObject(ROLL);
+		yaw = new controlObject(YAW);
+		
 		run = true;
 	}
 	
@@ -26,7 +42,7 @@ public class Input implements Runnable{
 		
 		while(run){
 			getState();
-			// Sleep for around 1/4 second.
+			// Sleep for around 1/8 second.
 		}
 	}
 	
@@ -34,12 +50,14 @@ public class Input implements Runnable{
 	 * 
 	 *****************************************************************/
 	private void getState(){
-		int command = 0;
-		int value = 0;
+
+		throttle.setValue(0);
+		currentState.desiredStateChange(throttle.getCommunicationObject());
 		
 		// TODO: joystick stuff.
 		
-		CommunicationObject newState = new CommunicationObject(command, value);
-		stateLog.setState(newState);
+
+		
+		
 	}
 }
