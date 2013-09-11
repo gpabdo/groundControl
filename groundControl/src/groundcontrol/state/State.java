@@ -9,16 +9,40 @@ import groundcontrol.communication.*;
  * changed, that change is pushed out to the txqueue. 
  *****************************************************************/
 public class State {
-	int[][] theState;
-	LinkedList<CommunicationObject> stateHx;	// queue to keep hx.
-	Communication com;
+	private LinkedList<LinkedList<CommunicationObject>> currentState;
+	private Communication com;
+	private boolean[] update;
 
+	private static final int LENGTH = 20;
+	private static final int WRITE_LIST_SIZE = 2000;
+	private static final int TRIM_LIST_SIZE = 100;
+	
+	public static final int ACK 						= 0;
+	public static final int DESIRED_THROTTLE 			= 1;
+	public static final int ACTUAL_THROTTLE 			= 2;
+	public static final int DESIRED_PITCH 				= 3;
+	public static final int ACTUAL_PITCH				= 4;
+	public static final int DESIRED_ROLL				= 5;
+	public static final int ACTUAL_ROLL					= 6;
+	public static final int DESIRED_YAW					= 7;
+	public static final int ACTUAL_YAW					= 8;
+	public static final int DESIRED_AIRSPEED			= 9;
+	public static final int ACTUAL_AIRSPEED				= 10;
+	public static final int DESIRED_BAROMETRIC_ALTITUDE	= 11;
+	public static final int ACTUAL_BAROMETRIC_ALTITUDE	= 12;
+	
 	/******************************************************************
 	 * 
 	 *****************************************************************/
 	public State(){
-		theState = new int[30][30];
-		stateHx = new LinkedList<CommunicationObject>();
+		update = new boolean[LENGTH];
+		currentState = new LinkedList<LinkedList<CommunicationObject>>();
+		for( int i = 0; i < LENGTH; i++){
+			currentState.add(new LinkedList<CommunicationObject>());
+			currentState.get(i).add(new CommunicationObject(i, 0, "GROUND"));
+			update[i] = true;
+		}
+			
 		com = new Communication();
 	}
 	
@@ -37,10 +61,9 @@ public class State {
 	 *****************************************************************/
 	public void desiredStateChange(CommunicationObject state){
 		
-		if( theState[state.getCommand()][0] != state.getValue()){
-			theState[state.getCommand()][0] = state.getValue();
+		if( getCurrentState(state.getIdentifier()) != state.getValue()){
+			currentState.get( state.getIdentifier() ).add(state);	
 			com.txqueue.add(state);
-			saveState(state);
 		}
 	}
 	
@@ -49,21 +72,26 @@ public class State {
 	 *****************************************************************/
 	public void droneStateChange(CommunicationObject state){
 		
-		if( theState[state.getCommand()][0] != state.getValue()){
-			theState[state.getCommand()][0] = state.getValue();
-			theState[state.getCommand()][1] = 1;
-			saveState(state);
+		if( currentState.get( state.getIdentifier() ).getFirst().getValue() != state.getValue()){
+			currentState.get( state.getIdentifier() ).add(state);
+			saveState(currentState.get(state.getIdentifier()));
 		}
 	}
 	
 	/******************************************************************
 	 * 
 	 *****************************************************************/
-	private void saveState(CommunicationObject state){
-		stateHx.add(state);
+	private void saveState(LinkedList<CommunicationObject> theList){
+
+		if(theList.size() < WRITE_LIST_SIZE)
+			return;
 		
-		//if( stateHx.size() >= 1000)
-		
+		for( int i = WRITE_LIST_SIZE -1; i > TRIM_LIST_SIZE; i--)
+		{
+			CommunicationObject temp = theList.remove(i);
+			temp.getString();
+		}
+			
 		// TODO save state list to history file and posibly extract video.
 	}
 	
@@ -71,50 +99,14 @@ public class State {
 	 * These methods are used to get current information about the
 	 * state of the drone.
 	 *****************************************************************/
-	public int getState(int command){ 
-		theState[command][1] = 0; 		// Clear state changed.
-		return theState[command][0]; 	// Return the state.
+	public float getCurrentState(int identifier){ 
+		update[identifier] = false;
+		return currentState.get(identifier).getFirst().getValue();
 	}
 
 	/******************************************************************
 	 * 
 	 *****************************************************************/
-	public int[][] getState(){ 
-		return theState; 				// Return entire state.
-	}
-	
-	/******************************************************************
-	 * 
-	 *****************************************************************/
-	public int[][] getChanged(){
-		LinkedList<int[]> updatedStates = new LinkedList<int[]>();
-		for(int i = 0; i < theState.length; i++)
-		{
-			if(theState[i][1] == 1)
-			{
-				int[] value = new int[2];
-				value[0] = i;
-				value[1] = theState[i][0];
-				updatedStates.add(value);
-				theState[i][1] = 0;			// Clear state changed. 
-			}
-		}
-		
-		int[][] returnArray = new int[updatedStates.size()][updatedStates.size()];
-		for( int i = 0; i < returnArray.length; i++)
-		{
-			returnArray[i][0] = updatedStates.pop()[0];
-			returnArray[i][1] = updatedStates.pop()[1];
-		}
-		return returnArray;	
-	}
-	
-	/******************************************************************
-	 * 
-	 *****************************************************************/
-	public int getAirspeed(){
-		theState[10][1] = 0;			// Clear state changed.
-		return theState[10][0]; 		// Return the state.
-	}
+	public float getAirspeed(){ return getCurrentState(ACTUAL_AIRSPEED); }
 	
 }

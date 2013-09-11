@@ -8,7 +8,7 @@ import java.util.Calendar;
  * to be placed into a queue and acted upon when the system is
  * ready.
  * 
- * Command values:
+ * Identifier values:
  * 0  = ACK - should never be placed in object
  * 1  = Desired throttle
  * 2  = Actual throttle
@@ -25,18 +25,18 @@ import java.util.Calendar;
  * 
  *****************************************************************/
 public class CommunicationObject {
-	private int command;
-	private int value;
+	private int identifier;
+	private float value;
 	private String source;
 	private java.util.Date now;
 	
 	/******************************************************************
 	 * Default constructor builds the CommunicationObject.
 	 *****************************************************************/
-	public CommunicationObject( int theCommand, int theValue, 
+	public CommunicationObject( int theIdentifier, int theValue, 
 			String theSource){
 		now = Calendar.getInstance().getTime();
-		command = theCommand;
+		identifier = theIdentifier;
 		value = theValue;
 		source = theSource;
 	}
@@ -44,12 +44,12 @@ public class CommunicationObject {
 	/******************************************************************
 	 * Returns the command value.
 	 *****************************************************************/
-	public int getCommand(){ return command; } 
+	public int getIdentifier(){ return identifier; } 
 	
 	/******************************************************************
 	 * Returns the value of the command.
 	 *****************************************************************/
-	public int getValue(){ return value; }
+	public float getValue(){ return value; }
 	
 	/******************************************************************
 	 * Returns the source of the com object.
