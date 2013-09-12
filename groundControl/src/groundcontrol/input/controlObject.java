@@ -11,7 +11,7 @@ public class controlObject {
 	int maxValue;	// Largest number value can hold.
 	int trim;		// Adjust new input by trim.
 	int reverse; 	// reverse = -1, normal = 1;
-	
+
 	/******************************************************************
 	 * 
 	 *****************************************************************/

@@ -16,10 +16,10 @@ public class Input implements Runnable{
 	controlObject roll;
 	controlObject yaw;
 	
-	public static final int THROTTLE		= 0;
-	public static final int PITCH			= 2;
-	public static final int ROLL			= 4;
-	public static final int YAW				= 6;
+	public static final int THROTTLE		= 10;
+	public static final int PITCH			= 12;
+	public static final int ROLL			= 14;
+	public static final int YAW				= 16;
 	
 	/******************************************************************
 	 * 
