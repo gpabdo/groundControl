@@ -2,6 +2,7 @@ package groundcontrol.input;
 
 import groundcontrol.communication.CommunicationObject;
 import groundcontrol.state.*;
+import net.java.games.input.*;
 
 /******************************************************************
  * 
@@ -30,7 +31,6 @@ public class Input implements Runnable{
 		pitch = new controlObject(PITCH);
 		roll = new controlObject(ROLL);
 		yaw = new controlObject(YAW);
-		
 		run = true;
 	}
 	
@@ -40,8 +40,17 @@ public class Input implements Runnable{
 	@Override
 	public void run() {
 		
+		Controller[] ca = ControllerEnvironment.getDefaultEnvironment().getControllers();
+
+		if( ca != null ){
+			for(int i = 0; i < ca.length ; i++)
+			{
+				System.out.println("Found input device: " + ca[i].getName());
+			}
+		}
+
 		while(run){
-			getState();
+			//getState();
 			// Sleep for around 1/8 second.
 		}
 	}
@@ -50,14 +59,11 @@ public class Input implements Runnable{
 	 * 
 	 *****************************************************************/
 	private void getState(){
-
+		
 		throttle.setValue(0);
-		currentState.desiredStateChange(throttle.getCommunicationObject());
+		currentState.submitStateChange(throttle.getCommunicationObject());
 		
 		// TODO: joystick stuff.
-		
-
-		
 		
 	}
 }

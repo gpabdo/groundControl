@@ -1,6 +1,7 @@
 package groundcontrol.state;
 
 import java.util.LinkedList;
+
 import groundcontrol.communication.*;
 
 /******************************************************************
@@ -8,11 +9,13 @@ import groundcontrol.communication.*;
  * all aspects of the drone. When the state of a variable is 
  * changed, that change is pushed out to the txqueue. 
  *****************************************************************/
-public class State {
+public class State implements Runnable {
 	private LinkedList<LinkedList<CommunicationObject>> currentState;
+	private LinkedList<CommunicationObject> stateQueue;
 	private Communication com;
 	private boolean[] update;
 	private boolean log;
+	private boolean run;
 
 	private static final int LENGTH 					= 20;
 	private static final int TRIM_LIST_SIZE 			= 100;
@@ -38,23 +41,44 @@ public class State {
 	 * 
 	 *****************************************************************/
 	public State(){
+		com = new Communication();
 		update = new boolean[LENGTH];
-		setLog( false );
 		currentState = new LinkedList<LinkedList<CommunicationObject>>();
+		stateQueue = new LinkedList<CommunicationObject>();
+		setLog( false );
+		run = true;
 		
 		for( int i = 0; i < LENGTH; i++){
 			currentState.add(new LinkedList<CommunicationObject>());
 			currentState.get(i).add(new CommunicationObject(i, 0, "GROUND"));
 			update[i] = false;
 		}
-			
-		com = new Communication();
+	}
+	
+	/******************************************************************
+	 * 
+	 *****************************************************************/
+	@Override
+	public void run() {
+		
+		while(run){
+			if(stateQueue.size() != 0)
+				stateChange(stateQueue.pop());
+		}
+		
+	}
+	
+	/******************************************************************
+	 * 
+	 *****************************************************************/
+	public void submitStateChange(CommunicationObject newState){
+		stateQueue.add(newState);
 	}
 	
 	/******************************************************************
 	 * Connect to the drone.
 	 *****************************************************************/
-	public void connect(){
+	private void connect(){
 		Thread comThread = new Thread(com);		// Create com thread.
 		comThread.start();						// Start com thread.
 	}
@@ -64,7 +88,7 @@ public class State {
 	 * the current state of the drone. If this is a change in state, 
 	 * the state change is logged and true is returned.
 	 *****************************************************************/
-	public void StateChange(CommunicationObject state){
+	private void stateChange(CommunicationObject state){
 		int id = state.getIdentifier();
 		if( getCurrentState(id) != state.getValue()){
 			currentState.get(id).add(state);	
@@ -106,11 +130,15 @@ public class State {
 		return currentState.get(identifier).getFirst().getValue();
 	}
 
+	/******************************************************************
+	 * 
+	 *****************************************************************/
 	public void setLog( boolean setLog){ log = setLog; }
 	
 	/******************************************************************
 	 * 
 	 *****************************************************************/
 	public float getAirspeed(){ return getCurrentState(ACTUAL_AIRSPEED); }
+
 	
 }
